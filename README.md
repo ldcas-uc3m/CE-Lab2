@@ -43,6 +43,5 @@ sudo apt install acl
 ```
 
 ```bash
-cd src/
 bash script.sh
 ```
