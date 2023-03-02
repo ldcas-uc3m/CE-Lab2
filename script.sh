@@ -1,12 +1,12 @@
 #!/bin/bash
 
-id
+# id
 
-su user1
-newgrp
+# su user1
+# newgrp
 
-chown
-chgrp
+# chown
+# chgrp
 
 
 # --------
@@ -127,8 +127,43 @@ ls -l /home | grep user3  # drwxr-x---
 # change permissions
 chmod 0700 /home/user3
 ls -l /home | grep user3  # drwx------
+exit
 
-# TODO: c)
+# myls permissions
+cp /bin/ls /tmp/myls
+sudo chown user3 /tmp/myls
+sudo chgrp user3 /tmp/myls
+sudo chmod o+x /tmp/myls
+
+# user1 use myls to list home of user3
+su user1
+/tmp/myls /home/user3  # permission denied
+exit
+
+# set sticky bit (s) for setuid on myls (runs as owner)
+sudo chmod +s /tmp/myls
+ls -la /tmp/myls  # -rws-sr-x
+
+# check
+su user1
+/tmp/myls /home/user3  # good
+exit
+
+
+# --------
+# ACTIVITY 7
+# --------
+
+# add user3 to lab
+sudo usermod user3 -g lab
+
+# FIXME: /tmp/lab-text/bar.txt???
+
+# create /home/lab-text/bar.txt as user3
+su user3
+touch /home/lab-text/bar.txt
+
+
 
 
 # --------
