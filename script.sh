@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# id
-
-# su user1
-# newgrp
-
-# chown
-# chgrp
-
-
 # --------
 # ACTIVITY 1
 # --------
@@ -54,7 +45,6 @@ sudo usermod user2 -g grp2
 id user1
 id user2
 id user3
-
 
 
 # --------
@@ -109,7 +99,8 @@ ls /home/lab-text/user1file.txt  # -rw-r--r--
 exit
 # change umask
 su user2
-umask 0026  # default is 0666, so set umask 0006 so default permissions for user2 are -rw-rw---- (0666-0026=0640)
+umask 0026  # default is 0666, so set umask to 0026
+# so default permissions for user2 are -rw-rw---- (0666-0026=0640)
 # check
 touch /home/lab-text/user2file.txt
 ls -l /home/lab-text/user2file.txt  # -rw-r-----
@@ -133,7 +124,7 @@ exit
 cp /bin/ls /tmp/myls
 sudo chown user3 /tmp/myls
 sudo chgrp user3 /tmp/myls
-sudo chmod o+x /tmp/myls
+sudo chmod +x /tmp/myls
 
 # user1 use myls to list home of user3
 su user1
@@ -157,13 +148,32 @@ exit
 # add user3 to lab
 sudo usermod user3 -g lab
 
-# FIXME: /tmp/lab-text/bar.txt???
-
 # create /home/lab-text/bar.txt as user3
 su user3
 touch /home/lab-text/bar.txt
+chgrp lab /home/lab-text/bar.txt
+chmod 660 /home/lab-text/bar.txt  # -rw-r--r--
+exit
 
+# check user1 & 2 can read
+su user1
+cat /home/lab-text/bar.txt
+exit
 
+su user2
+cat /home/lab-text/bar.txt
+exit
+
+# set ACL
+sudo setfacl -m user1:--- /home/lab-text/bar.txt
+# check mask
+sudo ls -lah /home/lab-text/bar.txt
+sudo getfacl /home/lab-text/bar.txt  # mask::rw-
+
+# check user1 lost access
+su user1
+cat /home/lab-text/bar.txt
+exit
 
 
 # --------

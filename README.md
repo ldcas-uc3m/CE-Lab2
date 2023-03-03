@@ -42,6 +42,7 @@ Install ACLs. For apt:
 sudo apt install acl
 ```
 
+**NOTE:** Not 100% sure this works bc of the `su` commands, but it should work when run line by line.
 ```bash
 bash script.sh
 ```

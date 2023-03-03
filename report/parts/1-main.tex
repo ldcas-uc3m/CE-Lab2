@@ -1,0 +1,49 @@
+\section*{Activities}
+
+\subsection*{Activity 1}
+I first created the users with \texttt{sudo useradd -m user<N>}, and set their passwords with \texttt{sudo passwd -d user<N>}.\\
+I prefered the use of \texttt{useradd} instead of \texttt{adduser} as it's a more generic command and it's suitable for scripting.\\
+
+I checked their UIDs and GIDs with \texttt{id user<N>}, and obtained the following:
+\begin{itemize}
+    \item \texttt{user1}: \texttt{uid=1001, gid=1002}
+    \item \texttt{user2}: \texttt{uid=1002, gid=1003}
+    \item \texttt{user3}: \texttt{uid=1003, gid=1004}
+\end{itemize}
+
+\subsection*{Activity 2}
+I created the groups with \texttt{sudo groupadd grp<N>} and checked their GIDs with \texttt{cat /etc/group | grep group<N>}.\\
+The results were:
+\begin{itemize}
+    \item \texttt{grp1}: \texttt{gid=1005}
+    \item \texttt{grp2}: \texttt{gid=1006}
+\end{itemize}
+
+\subsection*{Activity 3}
+I added the users to the groups with \texttt{sudo usermod user<N> -g grp<N>}, and checked it with the \texttt{id user<N>} command.
+
+\subsection*{Activity 4}
+I logged in as \texttt{user1} using \texttt{su user1}, copied the file, and changed the permissions with \texttt{chown user1 myls} and \texttt{chmod 0710 myls}. The \texttt{0710} means \texttt{-rwx--x---} permissions, that is, owner (\texttt{user1}) can read, write, and execute, its group can only execute, and the other users don't have permissions.\\
+Trying to run \texttt{myls} as \texttt{user2} didn't work, as it's considered "other", and doesn't have permissions to execute that file.\\
+
+I then created the \texttt{lab} group using \texttt{sudo groupadd lab} and added the users to the group with \texttt{usermod}. Then I changed the group owner of \texttt{myls} with \texttt{sudo chgrp lab /home/user1/myls}.\\
+Now we can execute \texttt{myls} as \texttt{user2}, as they belong to the \texttt{lab} group, the group owner of the file, and that group has execution permissions.
+
+\subsection*{Activity 5}
+I set the permissions on the \texttt{/home/lab-text} directory to \texttt{770} (full permissions to owner and group, none to other) and changed the owner to \texttt{lab}.\\
+
+As \texttt{user1}, I created the file \texttt{/home/lab-text/user1file.txt}. As by default it created the file with \texttt{-rw-r--r--} permissions, \texttt{lab} is the group owner, and \texttt{user2} belongs to that group, the permissions for \texttt{user2} are read-only.\\
+
+In order to set the default permissions for \texttt{user2} to be \texttt{0640}, I set its umask to \texttt{0026} (\texttt{umask 0026}), as the default permissions for files on the system are \texttt{0666}, and $0666-0026=0640$.
+
+\subsection*{Activity 6}
+I set the permissions for \texttt{/home/user3/foo.txt} to \texttt{0700}, and changed the owner and group of \texttt{/tmp/myls} to \texttt{user3}, using \texttt{chmod +x /tmp/myls} to allow everyone to execute it.\\
+
+As \texttt{user1}, I can't use \texttt{myls} to list \texttt{/home/user3}, as I don't have the permissions to read that directory, and the program inherits my (the executer) UID.\\
+
+In order to make this possible, we can set the sticky bit (\texttt{s}) on \texttt{myls}, with \texttt{sudo chmod +s /tmp/myls}, so the program inherits the permissions of its owner (\texttt{user3}) when executed, allowing us to list its home directory as another user.
+
+\subsection*{Activity 7}
+I added \texttt{user3} to \texttt{lab} created the \texttt{/home/lab-text/bar.txt} file as user3 and set its group to \texttt{lab} and its permissions to \texttt{0660}. As \texttt{user1} and \texttt{user2} belong to the \texttt{lab} group, they all can read the file (checked with \texttt{cat}).\\
+
+In order to prevent \texttt{user1} from reading the file, we set the ACL so that they are specifically forbidden, with \texttt{sudo setfacl -m user1:--- /home/lab-text/bar.txt}. Now the mask is \texttt{mask::rw-}, as it's the logical or between the permissions of the owner, group, and others (\texttt{rw- | r-- | ---}).
