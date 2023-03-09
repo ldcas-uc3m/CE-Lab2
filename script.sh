@@ -100,7 +100,7 @@ exit
 # change umask
 su user2
 umask 0026  # default is 0666, so set umask to 0026
-# so default permissions for user2 are -rw-rw---- (0666-0026=0640)
+# so default permissions for user2 are -rw-r----- (0666-0026=0640)
 # check
 touch /home/lab-text/user2file.txt
 ls -l /home/lab-text/user2file.txt  # -rw-r-----
@@ -180,14 +180,16 @@ exit
 # CLEAN
 # --------
 
+sudo rm -rf /home/lab-text
+sudo rm /tmp/myls
+
 sudo userdel -r user1
 sudo userdel -r user2
 sudo userdel -r user3
 
 sudo groupdel user1
 sudo groupdel user2
+sudo groupdel user3
 sudo groupdel grp1
 sudo groupdel grp2
 sudo groupdel lab
-
-
